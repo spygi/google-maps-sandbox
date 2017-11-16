@@ -22,50 +22,83 @@
 <body>
 
 <div id="map"></div>
+
 <script>
+    var locations = {
+        "Auckland": {
+            lat: -36.8485, 
+            lng: 174.7633,
+            pictures: ["pic.jpg", "stopb.jpg"]
+        },
+        "random": {
+            lat: -38.8485, 
+            lng: 177.7633,
+            pictures: ["c.png"]
+        }
+    };
+
     function initMap() {
-        var directionsService = new google.maps.DirectionsService;
-        var directionsDisplay = new google.maps.DirectionsRenderer();
         var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 1,
+            zoom: 4,
             center: {lat: -31.5, lng: 151.5}
         });
-        directionsDisplay.setMap(map);
-        var infoWindow = new google.maps.InfoWindow({
-            content: '<img src="photos/Auckland.jpg" alt="Auckland picture" height="250px"/>'
-        });
-        directionsDisplay.setOptions({suppressInfoWindow: true});
+    
+        for (var locationKey in locations) {
+            if (locations.hasOwnProperty(locationKey)) {
+                var location = locations[locationKey];
 
-        directionsService.route({
-            origin: "Auckland, New Zealand",
-            destination: "Wellington, New Zealand",
-            avoidTolls: true,
-            waypoints: [{
-                location: "Whitianga, New Zealand",
-                stopover: true
-            }],
-            travelMode: 'DRIVING'
-        }, function (response, status) {
-            if (status === 'OK') {
-                directionsDisplay.setDirections(response);
-                var myRoute = response.routes[0].legs[0];
+                // create marker
                 var marker = new google.maps.Marker;
                 marker.setMap(map);
-                marker.setPosition(myRoute.steps[0].start_location);
-                console.log(marker);
-                marker.addListener('click', function() {
-                   infoWindow.open(map, marker);
+                marker.setPosition({lat: location.lat, lng: location.lng});
+
+                // attach pictures
+                var locationPictures = document.createElement("div");  
+                for (var i = 0; i < location.pictures.length; i++) {
+                    var img = document.createElement("img");
+                    img.src = "photos/" + location.pictures[i];
+                    img.setAttribute("height", "250px");
+                    img.id =  locationKey + "-" + i; // some repetition in the data here, only to make our lives easier later on
+                    img.className = locationKey;
+                    img.setAttribute("data-id", i);
+
+                    img.onclick = changePic;
+
+                    if (i !== 0) {
+                        // only the first is visible initially
+                        img.style.display = "none";
+                    }
+                    locationPictures.appendChild(img);
+                }
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: locationPictures
                 });
-            } else {
-                window.alert('Directions request failed due to ' + status);
+
+                (function (_marker, _infoWindow) {
+                    // we need to use a closure here due to the asynchronous callback
+                    _marker.addListener('click', function() {
+                        _infoWindow.open(map, _marker);
+                    });
+                })(marker, infoWindow);
             }
-        });
+        }
+    }
+
+    function changePic(event){
+        // hide the current picture
+        this.style.display = "none";
+
+        // cycle through
+        var next = (parseInt(this.dataset.id, 10) + 1) % locations[this.className].pictures.length;
+        document.getElementById(this.className + "-" +  next).style.display = "block";
     }
 </script>
 
-<!-- Replace the value of the key parameter with your own API key. -->
+<!-- Replace the value of the locationKey parameter with your own API locationKey. -->
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlMpJ4LrF2y0VWSR1qbGwfEjoSomfY_dI&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?locationKey=AIzaSyBlMpJ4LrF2y0VWSR1qbGwfEjoSomfY_dI&callback=initMap">
 </script>
+
 </body>
 </html>
