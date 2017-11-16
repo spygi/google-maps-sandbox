@@ -62,7 +62,10 @@
                     img.className = locationKey;
                     img.setAttribute("data-id", i);
 
-                    img.onclick = changePic;
+                    if (locations.locationKey.pictures.length > 1) {
+                        // nothing to cycle through
+                        img.onclick = changePic;  
+                    }
 
                     if (i !== 0) {
                         // only the first is visible initially
