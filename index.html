@@ -24,11 +24,23 @@
 <div id="map"></div>
 
 <script>
+    var initialZoom = 4;
+    var currentZoom;
+
+    var markersForInitialZoom = [];
+    var markersForZoomedIn = [];
+
     var locations = {
         "Auckland": {
             lat: -36.8485, 
             lng: 174.7633,
             pictures: ["pic.jpg", "stopb.jpg"]
+        },
+         "Whitianga": {
+            lat: -38.8485, 
+            lng: 168.7633,
+            pictures: ["zoom.jpg"],
+            onlyForZoomedIn: true
         },
         "random": {
             lat: -38.8485, 
@@ -37,19 +49,49 @@
         }
     };
 
+    var map;
+
     function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: initialZoom,
             center: {lat: -31.5, lng: 151.5}
         });
+
+        currentZoom = initialZoom;
+        createMarkersAndAttachPictures();
+
+        map.addListener("zoom_changed", function() {
+            if (map.getZoom() > initialZoom) {
+                // display more markers
+                for (var i = 0; i < markersForZoomedIn.length ; i++) {
+                    markersForZoomedIn[i].setMap(map);
+                }
+            } else if (map.getZoom() <= initialZoom && currentZoom > initialZoom) {
+                // remove markers
+                for (var i = 0; i < markersForZoomedIn.length ; i++) {
+                    markersForZoomedIn[i].setMap(null);
+                }
+            }
+
+            // update currentZoom for the next zoom change
+            currentZoom = map.getZoom();
+        });
+    }
     
+    function createMarkersAndAttachPictures() {
         for (var locationKey in locations) {
             if (locations.hasOwnProperty(locationKey)) {
                 var location = locations[locationKey];
 
                 // create marker
                 var marker = new google.maps.Marker;
-                marker.setMap(map);
+                if (!location.onlyForZoomedIn) {
+                    marker.setMap(map);
+                    markersForInitialZoom.push(marker);
+                } else {
+                    markersForZoomedIn.push(marker);
+                }
+
                 marker.setPosition({lat: location.lat, lng: location.lng});
 
                 // attach pictures
