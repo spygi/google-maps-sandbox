@@ -17,11 +17,29 @@
             margin: 0;
             padding: 0;
         }
+
+        #overlay {
+            position: absolute;
+            top: 0px;
+            left: 50px;
+            width: 90%;
+        }
+
+        .full-screen {
+            transform: scale(1.5);
+        }
+
+        .next-pic-button {
+            position: absolute;
+            top: 50%;
+            height: 100px;
+        }
     </style>
 </head>
 <body>
 
 <div id="map"></div>
+<div id="overlay"></div>
 
 <script>
     var initialZoom = 4;
@@ -95,26 +113,27 @@
                 marker.setPosition({lat: location.lat, lng: location.lng});
 
                 // attach pictures
-                var locationPictures = document.createElement("div");  
-                for (var i = 0; i < location.pictures.length; i++) {
-                    var img = document.createElement("img");
-                    img.src = "photos/" + location.pictures[i];
-                    img.setAttribute("height", "250px");
-                    img.id =  locationKey + "-" + i; // some repetition in the data here, only to make our lives easier later on
-                    img.className = locationKey;
-                    img.setAttribute("data-id", i);
+                var locationPictures = document.createElement("div"); 
+                var img = document.createElement("img");
+                var srcString; 
+                img.src = "photos/" + location.pictures[0]; // display the first pic - there is always at least 1 pic
+                img.setAttribute("height", "250px");
+                img.setAttribute("data-id", 0);
+                img.onclick = growPic;
 
-                    if (locations[locationKey].pictures.length > 1) {
-                        // nothing to cycle through
-                        img.onclick = changePic;  
-                    }
+                img.setAttribute("data-imageslocations", location.pictures);
+                locationPictures.appendChild(img);
 
-                    if (i !== 0) {
-                        // only the first is visible initially
-                        img.style.display = "none";
-                    }
-                    locationPictures.appendChild(img);
-                }
+                var next = document.createElement("span");
+                next.textContent = ">>>";
+                next.setAttribute("data-currentid", 0);
+                next.className = "next-pic-button"
+                next.setAttribute("data-location", locationKey);
+
+                if (locations[locationKey].pictures.length > 1) {
+                    next.onclick = changePic;         
+                } // else nothing to cycle through
+                locationPictures.appendChild(next);
 
                 var infoWindow = new google.maps.InfoWindow({
                     content: locationPictures
@@ -130,13 +149,32 @@
         }
     }
 
-    function changePic(event){
-        // hide the current picture
-        this.style.display = "none";
+    function growPic (event) {
+        var cloneContainer = this.parentNode.cloneNode(true);
+        document.getElementById("map").style.opacity = 0.05;
+        document.getElementById("overlay").appendChild(cloneContainer);
 
-        // cycle through
-        var next = (parseInt(this.dataset.id, 10) + 1) % locations[this.className].pictures.length;
-        document.getElementById(this.className + "-" +  next).style.display = "block";
+        cloneContainer.firstChild.className += " full-screen";
+
+        window.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                document.getElementById("map").style.opacity = 1;
+                document.getElementById("overlay").removeChild(document.getElementById("overlay").firstChild);
+            }
+        }, {once: true});
+    }
+
+    function changePic(event){
+        var currentPic = parseInt(this.dataset.currentid, 10);
+        var next = (currentPic + 1) % this.previousSibling.dataset.imageslocations.split(",").length;
+
+        // "hide" the current picture and show the next by changing the src attribute
+        var picToShow = "photos/" + this.previousSibling.dataset.imageslocations.split(",")[next];
+        this.previousSibling.src = picToShow;
+        this.previousSibling.setAttribute("data-id", next);
+
+        // update the data attribute
+        this.setAttribute("data-currentid", next); 
     }
 </script>
 
