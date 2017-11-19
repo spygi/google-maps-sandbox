@@ -50,18 +50,137 @@
         "Auckland": {
             lat: -36.8485, 
             lng: 174.7633,
-            pictures: ["pic.jpg", "stopb.jpg"]
+            pictures: [0, 1, 2,3,4,5,6,7]
         },
-         "Whitianga": {
-            lat: -38.8485, 
-            lng: 168.7633,
-            pictures: ["zoom.jpg"],
+        "Coromandel": {
+            lat: -36.864500,
+            lng: 175.436250,
+            pictures: [9],
             onlyForZoomedIn: true
         },
-        "random": {
-            lat: -38.8485, 
-            lng: 177.7633,
-            pictures: ["c.png"]
+         "Whitianga": {
+            lat: -36.842489, 
+            lng: 175.673252,
+            pictures: [10],
+            onlyForZoomedIn: true
+        },
+        "Cathedral": {
+            lat: -36.827644, 
+            lng: 175.789369,
+            pictures: [11,12,13,14]
+        },
+         "HotWater": {
+            lat: -36.887075, 
+            lng: 175.823464,
+            pictures: [15],
+            onlyForZoomedIn: true
+        },
+        "Waitomo": {
+            lat: -38.248290, 
+            lng: 175.122499,
+            pictures: [19,20,21]
+        },
+        "BlueSpring": {
+            lat: -38.036505, 
+            lng: 175.834934,
+            pictures: [22,23]
+        },
+        "Waiotapu": {
+            lat: -38.358433, 
+            lng: 176.368995,
+            pictures: [24,25,26,27,28]
+        },
+         "Taupo": {
+            lat: -38.660049, 
+            lng: 175.962817,
+            pictures: [29,30],
+            onlyForZoomedIn: true
+        },
+        "Wellington": {
+            lat: -41.206585, 
+            lng: 174.793432,
+            pictures: [33,34,35]
+        },
+        "Punakaiki": {
+            lat: -42.095359, 
+            lng: 171.338952,
+            pictures: [36,37]
+        }, 
+        "Franz": {
+            lat: -43.396086, 
+            lng: 170.168488,
+            pictures: [38,39,40,41]
+        }, 
+        "Wanaka": {
+            lat: -44.712512, 
+            lng: 169.142621,
+            pictures: [42,43,44,45,46]
+        },
+        "Cook": {
+            lat: -43.600506,  
+            lng: 170.135651,
+            pictures: [47,48]
+        },
+        "Milford": {
+            lat: -44.662710, 
+            lng: 167.942180,
+            pictures: [49,50,51]
+        },
+        "Qtown": {
+            lat: -45.019505, 
+            lng: 168.680868,
+            pictures: [52,53]
+        },
+        "Paihia": {
+            lat: -35.284218, 
+            lng: 174.060699,
+            pictures: [54,55,56,57,58,59,60,61]
+        },
+        "Sydney": {
+            lat: -33.866174, 
+            lng: 150.808343,
+            pictures: [62,63,64,65,66,67,68,69]
+        },
+        "Morisset": {
+            lat: -33.132999,  
+            lng: 151.516042,
+            pictures: [70,71,72]
+        },
+        "Byron": {
+            lat: -28.652136,   
+            lng: 153.584528,
+            pictures: [73,74,75,76,77,78]
+        },
+         "GoldCoast": {
+            lat: -28.007850, 
+            lng: 153.407274,
+            pictures: [79,80],
+            onlyForZoomedIn: true
+        },
+        "Brisbane": {
+            lat: -27.481811,    
+            lng: 153.004144,
+            pictures: [81,"801.jpg", "802.jpg"]
+        },
+        "Noosa": {
+            lat: -26.362500,     
+            lng: 152.980593,
+            pictures: [82,"803.jpg"]
+        },
+        "Whitsundays": {
+            lat: -20.320127,      
+            lng: 148.721157,
+            pictures: [83,84,"804.jpg"]
+        },
+        "Magnetic": {
+            lat: -19.146251,       
+            lng: 146.829325,
+            pictures: [85]
+        },
+        "Melbourne": {
+            lat: -37.831142,        
+            lng: 144.935418,
+            pictures: [86,87,88,89,90,91]
         }
     };
 
@@ -149,7 +268,7 @@
 
     function growPic (event) {
         var cloneContainer = this.parentNode.cloneNode(true); 
-        document.getElementById("map").style.opacity = 0.05;
+        document.getElementById("map").style.opacity = 0.1;
         document.getElementById("overlay").appendChild(cloneContainer); // instead of a clone we could appendChild of the original node but then on closing the overlay we would need to put it back into place
 
         cloneContainer.firstChild.setAttribute("height", "800px");
