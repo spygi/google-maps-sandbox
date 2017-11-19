@@ -25,14 +25,12 @@
             width: 90%;
         }
 
-        .full-screen {
-            transform: scale(1.5);
-        }
-
         .next-pic-button {
             position: absolute;
             top: 50%;
             height: 100px;
+            cursor: pointer;
+            margin: 0 10px;
         }
     </style>
 </head>
@@ -131,9 +129,9 @@
                 next.setAttribute("data-location", locationKey);
 
                 if (locations[locationKey].pictures.length > 1) {
-                    next.onclick = changePic;         
+                    next.onclick = changePic; 
+                    locationPictures.appendChild(next);        
                 } // else nothing to cycle through
-                locationPictures.appendChild(next);
 
                 var infoWindow = new google.maps.InfoWindow({
                     content: locationPictures
@@ -150,12 +148,15 @@
     }
 
     function growPic (event) {
-        var cloneContainer = this.parentNode.cloneNode(true);
+        var cloneContainer = this.parentNode.cloneNode(true); 
         document.getElementById("map").style.opacity = 0.05;
-        document.getElementById("overlay").appendChild(cloneContainer);
+        document.getElementById("overlay").appendChild(cloneContainer); // instead of a clone we could appendChild of the original node but then on closing the overlay we would need to put it back into place
 
-        cloneContainer.firstChild.className += " full-screen";
-
+        cloneContainer.firstChild.setAttribute("height", "800px");
+        // because we did a deep clone we need to re-attach a click handler
+        if (cloneContainer.firstChild.dataset.imageslocations.split(",").length > 1) {
+            cloneContainer.firstChild.nextSibling.onclick = changePic;       
+        }
         window.addEventListener("keydown", function (event) {
             if (event.key === "Escape") {
                 document.getElementById("map").style.opacity = 1;
