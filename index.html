@@ -4,7 +4,6 @@
     <title>Trip</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="app.css" media="screen" />
 
     <style>
         /* Always set the map height explicitly to define the size of the div
@@ -35,6 +34,18 @@
             margin: 0 10px;
         }
 
+        #next-location {
+            position: absolute;
+            top: 50px;
+            right: 200px;
+        }
+
+        #all-locations {
+            position: absolute;
+            top: 50px;
+            right: 70px;
+        }
+
         img {
             image-orientation: from-image;
         }
@@ -44,6 +55,8 @@
 
 <div id="map"></div>
 <div id="overlay"></div>
+<button id="next-location">Show next location</button>
+<button id="all-locations">Show all locations</button>
 
 <script src="locations">// provides the locations object </script>
 <script src="app.js">// the app logic</script>

@@ -3,6 +3,9 @@ var currentZoom;
 
 var markersForInitialZoom = [];
 var markersForZoomedIn = [];
+var allMarkers = [];
+var currentVisibleMarkerIndex; 
+var showAllMarkersToggle = false; 
 
 var map;
 
@@ -15,22 +18,89 @@ function initMap() {
     currentZoom = initialZoom;
     createMarkersAndAttachPictures();
 
-    map.addListener("zoom_changed", function() {
-        if (map.getZoom() > initialZoom) {
-            // display more markers
-            for (var i = 0; i < markersForZoomedIn.length ; i++) {
-                markersForZoomedIn[i].setMap(map);
-            }
-        } else if (map.getZoom() <= initialZoom && currentZoom > initialZoom) {
-            // remove markers
-            for (var i = 0; i < markersForZoomedIn.length ; i++) {
-                markersForZoomedIn[i].setMap(null);
-            }
+    map.addListener("zoom_changed", zoomChanged);
+
+    document.getElementById("next-location").onclick = showNextLocation;
+    document.getElementById("all-locations").onclick = function () {
+        if (!showAllMarkersToggle) {
+            document.getElementById("all-locations").textContent = "Hide all locations";
+        } else {
+            document.getElementById("all-locations").textContent = "Show all locations";
         }
 
-        // update currentZoom for the next zoom change
-        currentZoom = map.getZoom();
-    });
+        showAllMarkersToggle = !showAllMarkersToggle;
+        showAllLocations();
+    };
+}
+
+function showNextLocation () {
+    if (showAllMarkersToggle)  {
+        // nothing to do, all markers are visible anyway
+        return;
+    }
+
+    var nextMarkerIndex = (currentVisibleMarkerIndex + 1) % allMarkers.length;
+    allMarkers[nextMarkerIndex].setMap(map);
+    currentVisibleMarkerIndex = nextMarkerIndex;
+
+    if (currentVisibleMarkerIndex === allMarkers.length - 1) {
+        document.getElementById("next-location").textContent = "Start over";
+    } else if (currentVisibleMarkerIndex === 0) {
+        document.getElementById("next-location").textContent = "Show next location";
+
+        // hide the rest
+        for (var i = 1; i < allMarkers.length; i++) {
+            allMarkers[i].setMap(null);
+        }
+    }
+}
+
+function zoomChanged () {
+    if (!showAllMarkersToggle) {
+        // changing the zoom has an effect only when *all* markers are visible
+        return;
+    }
+
+    if (map.getZoom() > initialZoom && currentZoom <= initialZoom) {
+        // display more markers only if we zoomed in and the previous level was not zoomed in already
+        for (var i = 0; i < markersForZoomedIn.length ; i++) {
+            markersForZoomedIn[i].setMap(map);
+        }
+    } else if (map.getZoom() <= initialZoom && currentZoom > initialZoom) {
+        // remove markers
+        for (var i = 0; i < markersForZoomedIn.length ; i++) {
+            markersForZoomedIn[i].setMap(null);
+        }
+    }
+
+    // update currentZoom for the next zoom change
+    currentZoom = map.getZoom();
+}
+
+function showAllLocations () {
+    // show all markers if the toggle says so and only if they are not visible already
+    if (showAllMarkersToggle && currentVisibleMarkerIndex < allMarkers.length - 1) {
+
+        // show initial zoom markers
+        for (var i = 0; i < markersForInitialZoom.length ; i++) {
+            markersForInitialZoom[i].setMap(map);
+        }  
+
+        if (map.getZoom() > initialZoom) {
+            // show also zoomed-in markers
+            for (var i = 0; i < markersForZoomedIn.length ; i++) {
+                markersForZoomedIn[i].setMap(map);
+            }      
+        }
+    } else {
+        // hide everything but the first
+        for (var i = 1; i < allMarkers.length ; i++) {
+            allMarkers[i].setMap(null);
+        }
+
+        // reset the index 
+        currentVisibleMarkerIndex = 0;
+    }    
 }
 
 function createMarkersAndAttachPictures() {
@@ -41,11 +111,17 @@ function createMarkersAndAttachPictures() {
             // create marker
             var marker = new google.maps.Marker;
             if (!location.onlyForZoomedIn) {
-                marker.setMap(map);
+                if (markersForInitialZoom.length === 0) {
+                    // it is the first marker therefore make it visible
+                    marker.setMap(map);
+                    currentVisibleMarkerIndex = 0;
+                }
+                
                 markersForInitialZoom.push(marker);
             } else {
                 markersForZoomedIn.push(marker);
             }
+            allMarkers.push(marker);
 
             marker.setPosition({lat: location.lat, lng: location.lng});
 
@@ -96,10 +172,17 @@ function growPic (event) {
     if (cloneContainer.firstChild.dataset.imageslocations.split(",").length > 1) {
         cloneContainer.firstChild.nextSibling.onclick = changePic;       
     }
+
+    // hide location buttons
+    document.getElementById("next-location").style.visibility = "hidden";
+    document.getElementById("all-locations").style.visibility = "hidden";
+
     window.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
             document.getElementById("map").style.opacity = 1;
             document.getElementById("overlay").removeChild(document.getElementById("overlay").firstChild);
+            document.getElementById("next-location").style.visibility = "visible";
+            document.getElementById("all-locations").style.visibility = "visible";
         }
     }, {once: true});
 }
