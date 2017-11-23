@@ -171,7 +171,7 @@ function createMarkersAndAttachPictures() {
             } else {
                 markersForZoomedIn.push(marker);
             }
-            marker.showDirections = location.showDirections === false ? false : true;
+            marker.showDirections = location.showDirections === false ? false : true; // default is true unless explicitly set to false
             allMarkers.push(marker);
 
             marker.setPosition({lat: location.lat, lng: location.lng});

@@ -2,7 +2,8 @@ var locations = {
     "Auckland": {
         lat: -36.8485, 
         lng: 174.7633,
-        pictures: [0, 1, 2,3,4,5,6,7]
+        pictures: [0, 1, 2,3,4,5,6,7],
+        showDirections: false
     },
     "Coromandel": {
         lat: -36.864500,
