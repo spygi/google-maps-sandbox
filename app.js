@@ -7,7 +7,7 @@ var allMarkers = [];
 var currentVisibleMarkerIndex; 
 var showAllMarkersToggle = false; 
 
-var map;
+var map, directionsService, directionsDisplay, directionsInfoWindow;
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -17,6 +17,12 @@ function initMap() {
 
     currentZoom = initialZoom;
     createMarkersAndAttachPictures();
+
+    directionsService = new google.maps.DirectionsService;  
+    directionsDisplay = new google.maps.DirectionsRenderer({
+        preserveViewport: true,
+        suppressMarkers: true
+    });
 
     map.addListener("zoom_changed", zoomChanged);
 
@@ -40,7 +46,45 @@ function showNextLocation () {
     }
 
     var nextMarkerIndex = (currentVisibleMarkerIndex + 1) % allMarkers.length;
-    allMarkers[nextMarkerIndex].setMap(map);
+    var nextMarker = allMarkers[nextMarkerIndex];
+    nextMarker.setMap(map);
+
+    // show directions
+    if ( nextMarker.showDirections ) {
+        directionsService.route({
+          origin: allMarkers[currentVisibleMarkerIndex].getPosition(),
+          destination: nextMarker.getPosition(),
+          travelMode: "DRIVING" 
+        }, function(response, status) {
+          if (status === 'OK') {
+            if (directionsInfoWindow) {
+                // close previous InfoWindows before opening new ones
+                directionsInfoWindow.close(map);
+            }
+
+            var standardRoute = response.routes[0].legs[0];
+            var numberOfSteps = standardRoute.steps.length;
+            directionsInfoWindow = new google.maps.InfoWindow({
+                content: standardRoute.distance.text + " in about " + standardRoute.duration.text,
+                position: standardRoute.steps[Math.floor(numberOfSteps / 2)].end_location,
+                disableAutoPan: true
+            });
+            directionsInfoWindow.open(map);
+
+            directionsDisplay.setMap(map); 
+            directionsDisplay.setDirections(response);
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+    } else {
+        // even if we don't show directions, it's better to close the previous ones
+        directionsDisplay.setMap(null);
+        if (directionsInfoWindow) {
+            directionsInfoWindow.close(map);
+        }
+    }
+
     currentVisibleMarkerIndex = nextMarkerIndex;
 
     if (currentVisibleMarkerIndex === allMarkers.length - 1) {
@@ -98,6 +142,12 @@ function showAllLocations () {
             allMarkers[i].setMap(null);
         }
 
+        // hide the directions too
+        directionsDisplay.setMap(null);
+        if (directionsInfoWindow) {
+            directionsInfoWindow.close(map);
+        }
+
         // reset the index 
         currentVisibleMarkerIndex = 0;
     }    
@@ -121,6 +171,7 @@ function createMarkersAndAttachPictures() {
             } else {
                 markersForZoomedIn.push(marker);
             }
+            marker.showDirections = location.showDirections === false ? false : true;
             allMarkers.push(marker);
 
             marker.setPosition({lat: location.lat, lng: location.lng});

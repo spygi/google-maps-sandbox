@@ -69,8 +69,8 @@ var locations = {
         pictures: [42,43,44,45,46]
     },
     "Cook": {
-        lat: -43.600506,  
-        lng: 170.135651,
+        lat: -43.735368,
+        lng: 170.101041,
         pictures: [47,48]
     },
     "Milford": {
@@ -86,12 +86,14 @@ var locations = {
     "Paihia": {
         lat: -35.284218, 
         lng: 174.060699,
-        pictures: [54,55,56,57,58,59,60,61]
+        pictures: [54,55,56,57,58,59,60,61],
+        showDirections: false 
     },
     "Sydney": {
         lat: -33.866174, 
         lng: 150.808343,
-        pictures: [62,63,64,65,66,67,68,69]
+        pictures: [62,63,64,65,66,67,68,69],
+        showDirections: false
     },
     "Morisset": {
         lat: -33.132999,  
@@ -125,13 +127,14 @@ var locations = {
         pictures: [83,84,"804.jpg"]
     },
     "Magnetic": {
-        lat: -19.146251,       
-        lng: 146.829325,
+        lat: -19.255014,       
+        lng: 146.825563,
         pictures: [85]
     },
     "Melbourne": {
         lat: -37.831142,        
         lng: 144.935418,
-        pictures: [86,87,88,89,90,91]
+        pictures: [86,87,88,89,90,91],
+        showDirections: false
     }
 };
