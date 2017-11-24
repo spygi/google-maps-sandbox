@@ -48,6 +48,10 @@ function showNextLocation () {
     var nextMarker = allMarkers[nextMarkerIndex];
     nextMarker.setMap(map);
 
+    // make the directions more visible
+    map.setZoom(initialZoom + 2);
+    map.setCenter(nextMarker.getPosition());
+
     // show directions
     if ( nextMarker.showDirections ) {
         directionsService.route({
@@ -82,6 +86,12 @@ function showNextLocation () {
         if (directionsInfoWindow) {
             directionsInfoWindow.close(map);
         }
+
+        // zoom out again
+        map.setZoom(initialZoom);
+
+        // open the infoWindow to make the marker more "noticable"
+        nextMarker.infoWindow.open(map, nextMarker);
     }
 
     currentVisibleMarkerIndex = nextMarkerIndex;
@@ -99,23 +109,29 @@ function showNextLocation () {
 }
 
 function showAllLocations () {
+    // hide any directions
+    directionsDisplay.setMap(null);
+    if (directionsInfoWindow) {
+        directionsInfoWindow.close(map);
+    } 
+
     // show all markers depending on the toggle value and only if they are not visible already
     if (showAllMarkersToggle && currentVisibleMarkerIndex < allMarkers.length - 1) {
         markerCluster.addMarkers(allMarkers);
+
+        // reset zoom
+        map.setZoom(initialZoom);
+
+        // disable next-location button since it's not used
+        document.getElementById("next-location").setAttribute("disabled", "");
     } else {
         // hide cluster. this also hides all markers
         markerCluster.clearMarkers();
-        allMarkers[0].setMap(map); 
-
-        // hide the directions too
-        directionsDisplay.setMap(null);
-        if (directionsInfoWindow) {
-            directionsInfoWindow.close(map);
-        }
-
-        // reset the index 
+        allMarkers[0].setMap(map); // show the first one only
         currentVisibleMarkerIndex = 0;
-    }    
+
+        document.getElementById("next-location").removeAttribute("disabled");
+    }   
 }
 
 function createMarkersAndAttachPictures() {
@@ -163,9 +179,13 @@ function createMarkersAndAttachPictures() {
                 content: locationPictures
             });
 
+            marker.infoWindow = infoWindow; // keep a reference, needed to self open some infoWindows
+            
             (function (_marker, _infoWindow) {
-                // we need to use a closure here due to the asynchronous callback
-                _marker.addListener('click', function() {
+                marker.addListener('click', function() { // here we can use both marker or _marker, the listener is attached immediately anyway
+                    // Without the immediately executed closure (?) when the callback function is executed after a click, it will run with the last context of createMarkersAndAttachPictures method
+                    // which means both the marker and the infoWindow will have the last values from the loop
+
                     _infoWindow.open(map, _marker);
                 });
             })(marker, infoWindow);
