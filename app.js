@@ -1,30 +1,29 @@
-var initialZoom = 4;
-var currentZoom;
+var initialZoom = 5;
 
-var markersForInitialZoom = [];
-var markersForZoomedIn = [];
 var allMarkers = [];
 var currentVisibleMarkerIndex; 
 var showAllMarkersToggle = false; 
+var markerCluster;
 
 var map, directionsService, directionsDisplay, directionsInfoWindow;
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: initialZoom,
-        center: {lat: -31.5, lng: 151.5}
+        center: {lat: -31.5, lng: 155.5}
     });
 
-    currentZoom = initialZoom;
     createMarkersAndAttachPictures();
+
+    markerCluster = new MarkerClusterer(map, [],
+            {imagePath: "clusterer/m",
+            gridSize: 40}); // don't show any clusters initially
 
     directionsService = new google.maps.DirectionsService;  
     directionsDisplay = new google.maps.DirectionsRenderer({
         preserveViewport: true,
         suppressMarkers: true
     });
-
-    map.addListener("zoom_changed", zoomChanged);
 
     document.getElementById("next-location").onclick = showNextLocation;
     document.getElementById("all-locations").onclick = function () {
@@ -99,48 +98,14 @@ function showNextLocation () {
     }
 }
 
-function zoomChanged () {
-    if (!showAllMarkersToggle) {
-        // changing the zoom has an effect only when *all* markers are visible
-        return;
-    }
-
-    if (map.getZoom() > initialZoom && currentZoom <= initialZoom) {
-        // display more markers only if we zoomed in and the previous level was not zoomed in already
-        for (var i = 0; i < markersForZoomedIn.length ; i++) {
-            markersForZoomedIn[i].setMap(map);
-        }
-    } else if (map.getZoom() <= initialZoom && currentZoom > initialZoom) {
-        // remove markers
-        for (var i = 0; i < markersForZoomedIn.length ; i++) {
-            markersForZoomedIn[i].setMap(null);
-        }
-    }
-
-    // update currentZoom for the next zoom change
-    currentZoom = map.getZoom();
-}
-
 function showAllLocations () {
-    // show all markers if the toggle says so and only if they are not visible already
+    // show all markers depending on the toggle value and only if they are not visible already
     if (showAllMarkersToggle && currentVisibleMarkerIndex < allMarkers.length - 1) {
-
-        // show initial zoom markers
-        for (var i = 0; i < markersForInitialZoom.length ; i++) {
-            markersForInitialZoom[i].setMap(map);
-        }  
-
-        if (map.getZoom() > initialZoom) {
-            // show also zoomed-in markers
-            for (var i = 0; i < markersForZoomedIn.length ; i++) {
-                markersForZoomedIn[i].setMap(map);
-            }      
-        }
+        markerCluster.addMarkers(allMarkers);
     } else {
-        // hide everything but the first
-        for (var i = 1; i < allMarkers.length ; i++) {
-            allMarkers[i].setMap(null);
-        }
+        // hide cluster. this also hides all markers
+        markerCluster.clearMarkers();
+        allMarkers[0].setMap(map); 
 
         // hide the directions too
         directionsDisplay.setMap(null);
@@ -160,17 +125,12 @@ function createMarkersAndAttachPictures() {
 
             // create marker
             var marker = new google.maps.Marker;
-            if (!location.onlyForZoomedIn) {
-                if (markersForInitialZoom.length === 0) {
-                    // it is the first marker therefore make it visible
-                    marker.setMap(map);
-                    currentVisibleMarkerIndex = 0;
-                }
-                
-                markersForInitialZoom.push(marker);
-            } else {
-                markersForZoomedIn.push(marker);
+            if (allMarkers.length === 0) {
+                // it is the first marker therefore make it visible
+                marker.setMap(map);
+                currentVisibleMarkerIndex = 0;
             }
+                
             marker.showDirections = location.showDirections === false ? false : true; // default is true unless explicitly set to false
             allMarkers.push(marker);
 

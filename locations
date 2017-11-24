@@ -8,14 +8,12 @@ var locations = {
     "Coromandel": {
         lat: -36.864500,
         lng: 175.436250,
-        pictures: [9],
-        onlyForZoomedIn: true
+        pictures: [9]
     },
      "Whitianga": {
         lat: -36.842489, 
         lng: 175.673252,
-        pictures: [10],
-        onlyForZoomedIn: true
+        pictures: [10]
     },
     "Cathedral": {
         lat: -36.827644, 
@@ -25,8 +23,7 @@ var locations = {
      "HotWater": {
         lat: -36.887075, 
         lng: 175.823464,
-        pictures: [15],
-        onlyForZoomedIn: true
+        pictures: [15]
     },
     "Waitomo": {
         lat: -38.248290, 
@@ -46,8 +43,7 @@ var locations = {
      "Taupo": {
         lat: -38.660049, 
         lng: 175.962817,
-        pictures: [29,30],
-        onlyForZoomedIn: true
+        pictures: [29,30]
     },
     "Wellington": {
         lat: -41.206585, 
