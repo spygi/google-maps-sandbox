@@ -1,6 +1,6 @@
 ## How-to
-* Put your photos in ```photos/``` folder
-* Adjust the ```locations``` file (order is important!) using following schema:
+* Put your photos in the ```photos/``` folder
+* Adjust the ```locations``` file (order is important!) using the following schema:
 ```
 "Sydney": { // a name for you to remember - not used in the code
     lat: -33.866174, // where the marker will be placed
@@ -11,8 +11,12 @@
 ```
 * Push and see live in [Github pages](https://spygi.github.io/oceania-2017/)
 
+## Notes
+* Vertical images work only on FF.
+
 ## Tech
 * [Google Maps JS API](https://developers.google.com/maps/documentation/javascript/)
-* [Google MarkerClusterer library]()
-* Dom manipulation with Vanilla JS (no JQuery etc)
+* [Google MarkerClusterer library](https://github.com/googlemaps/v3-utility-library/tree/master/markerclusterer)
+* DOM manipulation with Vanilla JS (no JQuery etc)
 * Deployed in [Github pages](https://spygi.github.io/oceania-2017/)
+* Developed in Sublime2.
