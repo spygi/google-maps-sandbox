@@ -105,8 +105,7 @@ var locations = {
      "GoldCoast": {
         lat: -28.007850, 
         lng: 153.407274,
-        pictures: [79,80],
-        onlyForZoomedIn: true
+        pictures: [79,80]
     },
     "Brisbane": {
         lat: -27.481811,    
