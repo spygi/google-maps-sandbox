@@ -1,7 +1,7 @@
 var initialZoom = 5;
 
 var allMarkers = [];
-var currentVisibleMarkerIndex; 
+var currentVisibleMarkerIndex;
 var showAllMarkersToggle = false; 
 var markerCluster;
 
@@ -60,10 +60,7 @@ function showNextLocation () {
           travelMode: "DRIVING" 
         }, function(response, status) {
           if (status === 'OK') {
-            if (directionsInfoWindow) {
-                // close previous InfoWindows before opening new ones
-                directionsInfoWindow.close(map);
-            }
+            closeInfoWindow(directionsInfoWindow); // close previous InfoWindows before opening new ones
 
             var standardRoute = response.routes[0].legs[0];
             var numberOfSteps = standardRoute.steps.length;
@@ -83,9 +80,7 @@ function showNextLocation () {
     } else {
         // even if we don't show directions, it's better to close the previous ones
         directionsDisplay.setMap(null);
-        if (directionsInfoWindow) {
-            directionsInfoWindow.close(map);
-        }
+        closeInfoWindow(directionsInfoWindow);
 
         // zoom out again
         map.setZoom(initialZoom);
@@ -111,9 +106,7 @@ function showNextLocation () {
 function showAllLocations () {
     // hide any directions
     directionsDisplay.setMap(null);
-    if (directionsInfoWindow) {
-        directionsInfoWindow.close(map);
-    } 
+    closeInfoWindow(directionsInfoWindow);
 
     // show all markers depending on the toggle value and only if they are not visible already
     if (showAllMarkersToggle && currentVisibleMarkerIndex < allMarkers.length - 1) {
@@ -229,4 +222,10 @@ function changePic(event){
 
     // update the data attribute
     this.setAttribute("data-currentid", next); 
+}
+
+function closeInfoWindow (infoWindow) {
+    if (infoWindow) {
+        infoWindow.close(map);
+    }
 }
