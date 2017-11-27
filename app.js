@@ -197,18 +197,28 @@ function growPic (event) {
         cloneContainer.firstChild.nextSibling.onclick = changePic;       
     }
 
+    var closeElement = document.createElement("span");
+    closeElement.id = "close-overlay";
+    closeElement.textContent = "×";
+    closeElement.onclick  = closeOverlay;
+    cloneContainer.appendChild(closeElement);
+
     // hide location buttons
     document.getElementById("next-location").style.visibility = "hidden";
     document.getElementById("all-locations").style.visibility = "hidden";
 
     window.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
-            document.getElementById("map").style.opacity = 1;
-            document.getElementById("overlay").removeChild(document.getElementById("overlay").firstChild);
-            document.getElementById("next-location").style.visibility = "visible";
-            document.getElementById("all-locations").style.visibility = "visible";
+            closeOverlay();
         }
     }, {once: true});
+}
+
+function closeOverlay() {
+    document.getElementById("map").style.opacity = 1;
+    document.getElementById("overlay").removeChild(document.getElementById("overlay").firstChild);
+    document.getElementById("next-location").style.visibility = "visible";
+    document.getElementById("all-locations").style.visibility = "visible";
 }
 
 function changePic(event){
