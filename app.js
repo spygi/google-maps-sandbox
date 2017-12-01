@@ -128,6 +128,8 @@ function showAllLocations () {
 }
 
 function createMarkersAndAttachPictures() {
+    var locationInfoWindow, imgElement, nextImageElementContainer, nextImage;
+
     for (var locationKey in locations) {
         if (locations.hasOwnProperty(locationKey)) {
             var location = locations[locationKey];
@@ -146,30 +148,33 @@ function createMarkersAndAttachPictures() {
             marker.setPosition({lat: location.lat, lng: location.lng});
 
             // attach pictures
-            var locationPictures = document.createElement("div"); 
-            var img = document.createElement("img");
-            var srcString; 
-            img.src = "photos/" + location.pictures[0]; // display the first pic - there is always at least 1 pic
-            img.setAttribute("height", "250px");
-            img.setAttribute("data-id", 0);
-            img.onclick = growPic;
-
-            img.setAttribute("data-imageslocations", location.pictures);
-            locationPictures.appendChild(img);
-
-            var next = document.createElement("span");
-            next.textContent = ">>>";
-            next.setAttribute("data-currentid", 0);
-            next.className = "next-pic-button"
-            next.setAttribute("data-location", locationKey);
+            locationInfoWindow = document.createElement("div"); 
+            locationInfoWindow.className = "location-info-window";
+            imgElement = document.createElement("img");
+            imgElement.className = "location-image";
+            imgElement.src = "photos/" + location.pictures[0]; // display the first pic - there is always at least 1 pic
+            imgElement.setAttribute("height", "250px");
+            imgElement.setAttribute("data-id", 0);
+            imgElement.setAttribute("data-imageslocations", location.pictures);
+            imgElement.onclick = growPic;
+            locationInfoWindow.appendChild(imgElement);
 
             if (locations[locationKey].pictures.length > 1) {
-                next.onclick = changePic; 
-                locationPictures.appendChild(next);        
+                nextImageElementContainer = document.createElement("span");
+                nextImageElementContainer.className = "next-pic-button-container";
+                nextImageElementContainer.setAttribute("data-currentid", 0);
+                nextImageElementContainer.setAttribute("data-location", locationKey);
+                nextImageElementContainer.onclick = changePic; 
+
+                nextImage = document.createElement("div");
+                nextImage.className = "next-pic";
+
+                nextImageElementContainer.appendChild(nextImage);        
+                locationInfoWindow.appendChild(nextImageElementContainer);        
             } // else nothing to cycle through
 
             var infoWindow = new google.maps.InfoWindow({
-                content: locationPictures
+                content: locationInfoWindow
             });
 
             marker.infoWindow = infoWindow; // keep a reference, needed to self open some infoWindows

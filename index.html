@@ -26,12 +26,31 @@
             text-align: center;
         }
 
-        .next-pic-button {
+        .location-info-window {
+            position: relative;
+        }
+
+        .next-pic-button-container {
             position: absolute;
-            top: 50%;
-            height: 100px;
+            right: 0;
+            width: 50px;
+            height: 100%;
+            z-index: 100;
             cursor: pointer;
-            margin: 0 10px;
+        }
+
+        .next-pic-button-container:hover {
+            background-color: white;
+            opacity: 0.2;
+        }
+
+        .next-pic {
+            height: 70px;
+            margin-top: 100px;
+            width: auto;
+            background-image: url("right-arrow.png");
+            background-repeat: no-repeat;
+            background-size: contain;
         }
 
         #close-overlay {
@@ -69,7 +88,7 @@
 <button id="next-location">Show next location</button>
 <button id="all-locations">Show all locations</button>
 
-<script src="locations">// provides the locations object </script>
+<script src="locations">// provides the locations data object </script>
 <script src="app.js">// the app logic</script>
 
  <script src="clusterer/markerclusterer.js">
