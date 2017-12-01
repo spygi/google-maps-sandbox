@@ -4,6 +4,7 @@ var allMarkers = [];
 var currentVisibleMarkerIndex;
 var showAllMarkersToggle = false; 
 var markerCluster;
+var openLocationInfoWindow;
 
 var map, directionsService, directionsDisplay, directionsInfoWindow;
 
@@ -184,7 +185,11 @@ function createMarkersAndAttachPictures() {
                     // Without the immediately executed closure (?) when the callback function is executed after a click, it will run with the last context of createMarkersAndAttachPictures method
                     // which means both the marker and the infoWindow will have the last values from the loop
 
+                    // first close previously open info window
+                    closeInfoWindow(openLocationInfoWindow);
+
                     _infoWindow.open(map, _marker);
+                    openLocationInfoWindow = _infoWindow;
                 });
             })(marker, infoWindow);
         }
