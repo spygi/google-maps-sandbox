@@ -151,6 +151,8 @@ function createMarkersAndAttachPictures() {
             // attach pictures
             locationInfoWindow = document.createElement("div"); 
             locationInfoWindow.className = "location-info-window";
+
+            // img needs to be firstchild - see growPic()
             imgElement = document.createElement("img");
             imgElement.className = "location-image";
             imgElement.src = "photos/" + location.pictures[0]; // display the first pic - there is always at least 1 pic
@@ -161,17 +163,8 @@ function createMarkersAndAttachPictures() {
             locationInfoWindow.appendChild(imgElement);
 
             if (locations[locationKey].pictures.length > 1) {
-                nextImageElementContainer = document.createElement("span");
-                nextImageElementContainer.className = "next-pic-button-container";
-                nextImageElementContainer.setAttribute("data-currentid", 0);
-                nextImageElementContainer.setAttribute("data-location", locationKey);
-                nextImageElementContainer.onclick = changePic; 
-
-                nextImage = document.createElement("div");
-                nextImage.className = "next-pic";
-
-                nextImageElementContainer.appendChild(nextImage);        
-                locationInfoWindow.appendChild(nextImageElementContainer);        
+                addImageNavigation(locationInfoWindow, "next");
+                addImageNavigation(locationInfoWindow, "previous");
             } // else nothing to cycle through
 
             var infoWindow = new google.maps.InfoWindow({
@@ -232,20 +225,40 @@ function closeOverlay() {
 }
 
 function changePic(event){
-    var currentPic = parseInt(this.dataset.currentid, 10);
-    var next = (currentPic + 1) % this.previousSibling.dataset.imageslocations.split(",").length;
+    var imgElement = this.parentNode.firstChild;
+
+    var currentPic = parseInt(imgElement.dataset.id, 10);
+    var direction = this.classList[1]; // convention from addImageNavigation(...)
+    var numberOfImages = imgElement.dataset.imageslocations.split(",").length;
+    debugger;
+
+    var next;
+    if (direction === "next") {
+        next = (currentPic + 1) % numberOfImages;
+    } else {
+        next = (currentPic - 1 + numberOfImages) % numberOfImages;
+    }
 
     // "hide" the current picture and show the next by changing the src attribute
-    var picToShow = "photos/" + this.previousSibling.dataset.imageslocations.split(",")[next];
-    this.previousSibling.src = picToShow;
-    this.previousSibling.setAttribute("data-id", next);
-
-    // update the data attribute
-    this.setAttribute("data-currentid", next); 
+    var picToShow = "photos/" + imgElement.dataset.imageslocations.split(",")[next];
+    imgElement.src = picToShow;
+    imgElement.setAttribute("data-id", next);
 }
 
 function closeInfoWindow (infoWindow) {
     if (infoWindow) {
         infoWindow.close(map);
     }
+}
+
+function addImageNavigation (locationInfoWindow, direction) {
+    var arrowElementContainer = document.createElement("span");
+    arrowElementContainer.className = "arrow-container " + direction;
+    arrowElementContainer.onclick = changePic;
+
+    var arrow = document.createElement("div");
+    arrow.className = "arrow-pic " + direction;
+
+    arrowElementContainer.appendChild(arrow);  
+    locationInfoWindow.appendChild(arrowElementContainer); 
 }

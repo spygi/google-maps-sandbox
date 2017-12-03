@@ -34,27 +34,41 @@
             cursor: pointer;
         }
 
-        .next-pic-button-container {
-            position: absolute;
-            right: 0;
+        .arrow-container {
+            position: absolute;  
             width: 50px;
             height: 100%;
             z-index: 100;
             cursor: pointer;
         }
 
-        .next-pic-button-container:hover {
+        .arrow-container.next {
+            right: 0;
+        }
+
+        .arrow-container.previous {
+            left: 0;
+        }
+
+        .arrow-container:hover {
             background-color: rgba(255, 255, 255, 0.4); // using opacity would affect the child element too
         }
 
-        .next-pic {
+        .arrow-pic {
             height: 70px;
             position: relative;
             top: 40%;
             width: auto;
-            background-image: url("right-arrow.png");
             background-repeat: no-repeat;
             background-size: contain;
+        }
+
+        .arrow-pic.next {
+            background-image: url("right-arrow.png");
+        }
+
+        .arrow-pic.previous {
+            background-image: url("left-arrow.png");
         }
 
         #close-overlay {
