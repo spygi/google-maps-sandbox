@@ -48,6 +48,7 @@ function showNextLocation () {
     var nextMarkerIndex = (currentVisibleMarkerIndex + 1) % allMarkers.length;
     var nextMarker = allMarkers[nextMarkerIndex];
     nextMarker.setMap(map);
+    openInfoWindow(nextMarker.infoWindow, nextMarker, true);
 
     // make the directions more visible
     map.setZoom(initialZoom + 2);
@@ -108,6 +109,7 @@ function showAllLocations () {
     // hide any directions
     directionsDisplay.setMap(null);
     closeInfoWindow(directionsInfoWindow);
+    closeInfoWindow(openLocationInfoWindow);
 
     // show all markers depending on the toggle value and only if they are not visible already
     if (showAllMarkersToggle && currentVisibleMarkerIndex < allMarkers.length - 1) {
@@ -123,25 +125,21 @@ function showAllLocations () {
         markerCluster.clearMarkers();
         allMarkers[0].setMap(map); // show the first one only
         currentVisibleMarkerIndex = 0;
+        openInfoWindow(allMarkers[0].infoWindow, allMarkers[0], false);
 
         document.getElementById("next-location").removeAttribute("disabled");
     }   
 }
 
 function createMarkersAndAttachPictures() {
-    var locationInfoWindow, imgElement, nextImageElementContainer, nextImage;
+    var location, marker, infoWindow, infoWindowContent, imgElement;
 
     for (var locationKey in locations) {
         if (locations.hasOwnProperty(locationKey)) {
-            var location = locations[locationKey];
+            location = locations[locationKey];
 
             // create marker
-            var marker = new google.maps.Marker;
-            if (allMarkers.length === 0) {
-                // it is the first marker therefore make it visible
-                marker.setMap(map);
-                currentVisibleMarkerIndex = 0;
-            }
+            marker = new google.maps.Marker;
                 
             marker.showDirections = location.showDirections === false ? false : true; // default is true unless explicitly set to false
             allMarkers.push(marker);
@@ -149,8 +147,8 @@ function createMarkersAndAttachPictures() {
             marker.setPosition({lat: location.lat, lng: location.lng});
 
             // attach pictures
-            locationInfoWindow = document.createElement("div"); 
-            locationInfoWindow.className = "location-info-window";
+            infoWindowContent = document.createElement("div"); 
+            infoWindowContent.className = "location-info-window";
 
             // img needs to be firstchild - see growPic()
             imgElement = document.createElement("img");
@@ -160,15 +158,15 @@ function createMarkersAndAttachPictures() {
             imgElement.setAttribute("data-id", 0);
             imgElement.setAttribute("data-imageslocations", location.pictures);
             imgElement.onclick = growPic;
-            locationInfoWindow.appendChild(imgElement);
+            infoWindowContent.appendChild(imgElement);
 
             if (locations[locationKey].pictures.length > 1) {
-                addImageNavigation(locationInfoWindow, "next");
-                addImageNavigation(locationInfoWindow, "previous");
+                addImageNavigation(infoWindowContent, "next");
+                addImageNavigation(infoWindowContent, "previous");
             } // else nothing to cycle through
 
-            var infoWindow = new google.maps.InfoWindow({
-                content: locationInfoWindow
+            infoWindow = new google.maps.InfoWindow({
+                content: infoWindowContent
             });
 
             marker.infoWindow = infoWindow; // keep a reference, needed to self open some infoWindows
@@ -177,14 +175,17 @@ function createMarkersAndAttachPictures() {
                 marker.addListener('click', function() { // here we can use both marker or _marker, the listener is attached immediately anyway
                     // Without the immediately executed closure (?) when the callback function is executed after a click, it will run with the last context of createMarkersAndAttachPictures method
                     // which means both the marker and the infoWindow will have the last values from the loop
-
-                    // first close previously open info window
-                    closeInfoWindow(openLocationInfoWindow);
-
-                    _infoWindow.open(map, _marker);
-                    openLocationInfoWindow = _infoWindow;
+                    openInfoWindow(_infoWindow, _marker, true);
                 });
             })(marker, infoWindow);
+
+            if (allMarkers.length === 1) {
+                // it is the first marker therefore make it visible and open it's info window
+                marker.setMap(map);
+                currentVisibleMarkerIndex = 0;
+
+                openInfoWindow(infoWindow, marker, false);
+            }
         }
     }
 }
@@ -249,6 +250,14 @@ function closeInfoWindow (infoWindow) {
     if (infoWindow) {
         infoWindow.close(map);
     }
+}
+
+function openInfoWindow(infoWindow, marker, closePrevious) {
+    // first close previously opened info window
+    closePrevious ? closeInfoWindow(openLocationInfoWindow) : "" ;
+
+    infoWindow.open(map, marker);
+    openLocationInfoWindow = infoWindow;
 }
 
 function addImageNavigation (locationInfoWindow, direction) {
