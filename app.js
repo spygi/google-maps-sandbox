@@ -109,7 +109,7 @@ function showAllLocations () {
     // hide any directions
     directionsDisplay.setMap(null);
     closeInfoWindow(directionsInfoWindow);
-    closeInfoWindow(openLocationInfoWindow);
+    closeInfoWindow(openLocationInfoWindow);    
 
     // show all markers depending on the toggle value and only if they are not visible already
     if (showAllMarkersToggle && currentVisibleMarkerIndex < allMarkers.length - 1) {
@@ -196,9 +196,10 @@ function growPic (event) {
     document.getElementById("overlay").appendChild(cloneContainer); // instead of a clone we could appendChild of the original node but then on closing the overlay we would need to put it back into place
 
     cloneContainer.firstChild.setAttribute("height", "800px");
-    // because we did a deep clone we need to re-attach a click handler
+    // because we did a deep clone we need to re-attach the click handlers
     if (cloneContainer.firstChild.dataset.imageslocations.split(",").length > 1) {
         cloneContainer.firstChild.nextSibling.onclick = changePic;       
+        cloneContainer.firstChild.nextSibling.nextSibling.onclick = changePic;       
     }
 
     var closeElement = document.createElement("span");
@@ -231,7 +232,6 @@ function changePic(event){
     var currentPic = parseInt(imgElement.dataset.id, 10);
     var direction = this.classList[1]; // convention from addImageNavigation(...)
     var numberOfImages = imgElement.dataset.imageslocations.split(",").length;
-    debugger;
 
     var next;
     if (direction === "next") {
