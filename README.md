@@ -1,3 +1,5 @@
+[Demo](./out.gif)
+
 ## How-to
 * Put your photos in the ```photos/``` folder
 * Adjust the ```locations``` file (order is important!) using the following schema:
