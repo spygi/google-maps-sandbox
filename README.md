@@ -1,4 +1,4 @@
-[Demo](./out.gif)
+![Demo illusration](./out.gif "Demo")
 
 ## How-to
 * Put your photos in the ```photos/``` folder
